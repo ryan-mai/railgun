@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="playerForm">
+  <label for="name">Player Name:</label>
+  <input type="text" id="name" required>
+  <br>
+  <label for="name">Player Password:</label>
+  <input type="text" id="password" required>
+  <button type="button" id="submitData">Submit</button>
+  <button type="button" id="getData">Get Data</button>
+  <button type="button" id="googleAuth">Continue with Google</button>
+</form>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import { getFirestore, query, collection, where, setDoc, addDoc, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+  import { GoogleAuthProvider, getAuth, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBxhbX_ap_Ym55Tn4j0IOnn7R6-_Tu4PCM",
+    authDomain: "railgun-5955e.firebaseapp.com",
+    projectId: "railgun-5955e",
+    storageBucket: "railgun-5955e.firebasestorage.app",
+    messagingSenderId: "707281442050",
+    appId: "1:707281442050:web:21f12e67cc440656ce9e1b",
+    measurementId: "G-X5CF72SZ2P"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+  const auth = getAuth()
+  auth.languageCode = 'it';
+document.getElementById('googleAuth').addEventListener('click', async (e) => { 
+  signInWithPopup(auth, provider)
+    .then(async (result) => {
+      const user = result.user;
+      const email = user.email;
+      const playername = email.split('@')[0];
+
+      // Check if user exists
+      const querySnapshot = await getDocs(collection(db, "Players"));
+      let exists = false;
+      querySnapshot.forEach(doc => {
+        if (doc.data().name === playername) exists = true;
+      });
+
+      if (exists) {
+        alert('User already exists!');
+        return;
+      }
+
+      const rank = querySnapshot.size + 1;
+      await addDoc(collection(db, "Players"), { name: playername, rank });
+      alert('New Player Logged in as ' + playername);
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.customData?.email;
+      const credential = GoogleAuthProvider.credentialFromError(error);
+    });
+});
+
+document.getElementById('submitData').addEventListener('click', async (e) => { 
+  const name = document.getElementById('name').value;
+  const password = document.getElementById('password').value;
+
+  // Check if user exists
+  const querySnapshot = await getDocs(collection(db, "Players"));
+  let exists = false;
+  querySnapshot.forEach(doc => {
+    if (doc.data().name === name) exists = true;
+  });
+
+  if (exists) {
+    alert('User already exists!');
+    return;
+  }
+
+  const rank = querySnapshot.size + 1;
+  await addDoc(collection(db, "Players"), { name, password, rank });
+  alert('New Player Logged in');
+});
+
+document.getElementById('getData').addEventListener('click', async (e) => { 
+  const name = document.getElementById('name').value;
+  const querySnapshot = await getDocs(collection(db, "Players"));
+  let userRank = null;
+  querySnapshot.forEach(doc => {
+    console.log(doc.data().name, doc.data().rank); // Print all users for debugging
+    if (doc.data().name === name) {
+      userRank = doc.data().rank;
+    }
+  });
+  if (userRank !== null) {
+    alert("User Rank: " + userRank);
+  } else {
+    alert("User not found.");
+  }
+
+});
+</script>
+</body>
+</html>

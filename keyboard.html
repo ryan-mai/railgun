@@ -7,117 +7,81 @@
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="DRACOLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
+
 
   </head>
   <body>
     <script>
-      AFRAME.registerComponent('updateScore', {
-        schema: {
-          target: { type: 'selector', default: '#score' },
-          base: { type: 'number', default: 0 }
-        },
+      AFRAME.registerComponent('clickable-key', {
         init: function () {
-          this.score = this.data.target;
-        },
-        tick: function () {
-          this.el.addEventListener
-          this.score.object3D.position.x = this.data.baseX + playerX;
-        }
-      });
-      function getRnd(min, max) {
-        return Math.floor(Math.random() * (max - min) ) + min;
-      }
-      AFRAME.registerComponent('clickable', {
-        init: function () {
-          var box = document.querySelector('#box');
-          var score = document.querySelector('#score')
-
-          var lastIndex = -1;
-          var COLORS = ['red', 'green', 'blue'];
-          this.el.addEventListener('click', function (evt) {
-            lastIndex = (lastIndex + 1) % COLORS.length;
-            this.setAttribute('material', 'color', COLORS[lastIndex]);
-            box.object3D.position.x = getRnd(-10,10);
-            box.object3D.position.y = getRnd(-10,10);
-            
-            let scoreText = score.getAttribute('text').value;
-            const pattern = /\d/g;
-            let result = parseInt(scoreText.match(pattern)) + 1;
-            score.setAttribute('text', {value: `Score: ${result}`})
-            console.log('Hit At: ', evt.detail.intersection.point);
+          this.el.addEventListener('click', () => {
+            const key = document.getElementById("list");
+            const letter = key.firstElementChild.getAttribute('troika-text').value;
+            console.log(letter)
           });
         }
       });
-      AFRAME.registerComponent('aimbot', {
-        init: function () {
-          this.el.addEventListener('click', function (evt) {
-            var aimbot = document.querySelector('#aimbot')
-            aimbot.setAttribute('text', {value: `AIMBOT ON`})
-
-            setTimeout(() => {
-              console.log('AIMBOT ACTIVATED!!! :)')
-              aimbot.setAttribute('text', {value: `:))) BYEEE!!`})
-            }, 4000);
-          });
-        }
-      });
-    document.addEventListener('DOMContentLoaded', function() {
-      var sceneEl = document.querySelector('a-scene');
-      var reticleEl = document.querySelector("#ret");
-      var rayEl = document.querySelector("ray");
-    });
-    
-
     </script>
     <a-scene stats>
-        <a-assets>
-          <a-asset-item id="map" src="assets/models/city.glb"></a-asset-item>
-          <a-asset-item id="sinon" src="assets/models/sinon_sniping.glb"></a-asset-item>
-          <audio id="sao_op" src="assets/sounds/sao_op.mp3" preload="auto"></audio>
-          <audio id="shoot" src="assets/sounds/shoot.mp3" preload="auto"></audio>
+      <a-assets>
+        <a-asset-items>
           <img id="reticle" src="assets/images/reticle.png">
-          <video id="start" autoplay loop="false" src="assets/videos/start.mp4"></video>
-        </a-assets>
-        <a-videosphere src="#start"></a-videosphere>
-        <a-entity sound="src: #sao_op"></a-entity>
-        <a-entity gltf-model="#map" position="1.6 -50 -0.8" rotation="0 200 0" scale="1 1 1"></a-entity>
-        <a-sky color="#000"></a-sky>
-
-
+          
+        </a-asset-items>
+      </a-assets>
+        <!-- <a-sky color="#000"></a-sky> -->
         <a-entity id="player"
             position-reader
             nipple-controls="mode: static">
-            <a-plane aimbot width="5" height="2" position="0 0 -5" rotation="-15 0 0">
-                <a-entity text="value: aimbot; color: black; height: 5; width: 5; align: center" ></a-entity>
+            <a-plane id="list" class="clickable-key" clickable-key width="8" height="3" position="0 0 -5">
+                <a-entity troika-text="value: Q; color: black; fontSize: 0.5" position="0 0 -2"></a-entity>
             </a-plane>
+            <!-- <a-plane class="clickable-key" width="8" height="3" position="0 0 -5">
+                <a-entity troika-text="value: Q; color: black; fontSize: 0.5" class="clickable-key" position="-3.5 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: W; color: black; fontSize: 0.5" class="clickable-key" position="-2.75 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: E; color: black; fontSize: 0.5" class="clickable-key" position="-2 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: R; color: black; fontSize: 0.5" class="clickable-key" position="-1.25 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: T; color: black; fontSize: 0.5" class="clickable-key" position="-0.5 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: Y; color: black; fontSize: 0.5" class="clickable-key" position="0.25 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: U; color: black; fontSize: 0.5" class="clickable-key" position="1.00 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: I; color: black; fontSize: 0.5" class="clickable-key" position="1.75 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: O; color: black; fontSize: 0.5" class="clickable-key" position="2.5 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: P; color: black; fontSize: 0.5" class="clickable-key" position="3.25 0.5 0.1"></a-entity>
+                <a-entity troika-text="value: A; color: black; fontSize: 0.5" class="clickable-key" position="-3.3 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: S; color: black; fontSize: 0.5" class="clickable-key" position="-2.6 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: D; color: black; fontSize: 0.5" class="clickable-key" position="-1.9 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: F; color: black; fontSize: 0.5" class="clickable-key" position="-1.2 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: G; color: black; fontSize: 0.5" class="clickable-key" position="-0.5 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: H; color: black; fontSize: 0.5" class="clickable-key" position="0.2 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: I; color: black; fontSize: 0.5" class="clickable-key" position="0.9 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: J; color: black; fontSize: 0.5" class="clickable-key" position="1.6 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: K; color: black; fontSize: 0.5" class="clickable-key" position="2.3 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: L; color: black; fontSize: 0.5" class="clickable-key" position="3 -0.25 0.1"></a-entity>
+                <a-entity troika-text="value: Z; color: black; fontSize: 0.5" class="clickable-key" position="-2.4 -1 0.1"></a-entity>
+                <a-entity troika-text="value: X; color: black; fontSize: 0.5" class="clickable-key" position="-1.6 -1 0.1"></a-entity>
+                <a-entity troika-text="value: C; color: black; fontSize: 0.5" class="clickable-key" position="-0.8 -1 0.1"></a-entity>
+                <a-entity troika-text="value: V; color: black; fontSize: 0.5" class="clickable-key" position="0 -1 0.1"></a-entity>
+                <a-entity troika-text="value: B; color: black; fontSize: 0.5" class="clickable-key" position="0.8 -1 0.1"></a-entity>
+                <a-entity troika-text="value: N; color: black; fontSize: 0.5" class="clickable-key" position="1.6 -1 0.1"></a-entity>
+                <a-entity troika-text="value: M; color: black; fontSize: 0.5" class="clickable-key" position="2.4 -1 0.1"></a-entity>
+            </a-plane> -->
         <a-entity
             camera
             position="0 0.9 0"
             look-controls="true">
-            <a-plane width="2" height="0.5" position="7.5 3.75 -5">
-              <a-entity id="score" text="value: Score: 0; color: black; height: 5; width: 5; align: center" ></a-entity>
-            </a-plane>
-            <a-entity gltf-model="#sinon" animation-mixer="loop: repeat;" position="0 -1 0" scale="2 2 2" rotation="0 180 0"></a-entity>
+
             <a-entity
               id="ray"
-              cursor="fuse: true;"
-              raycaster="showLine: true; far: 50; lineColor: red; interval: 500; objects: .clickable, .aimbot;"
+              cursor="fuse: true; rayOrigin: true;"
+              raycaster="showLine: true; far: 50; lineColor: red; interval: 500; objects: .clickable-key;"
               material="color: red; shader: flat"
               position="0 0 0"
               rotation="0 0 0">
 
-              <a-image id="ret" src="#reticle"
-                      position="0 0 -10"
-                      width="2.5"
-                      height="2.5"
-                      rotation="0 0 0"
-                      material="src: #reticle; transparent: true; alphaTest: 0.01; depthTest: false;">
-              </a-image>
             </a-entity>
           </a-entity>
         </a-entity>
-<!-- -        <a-entity id="box" clickable geometry="primitive: box" material="color: blue" position="0 0 -2"></a-entity> -->
-<!-- +        <a-entity id="box" class="clickable" clickable  geometry="primitive: box" material="color: blue" position="0 0 -10" sound="src: #shoot; volume= 2.0; on: click"></a-entity> -->
     </a-scene>
   </body>
 </html>

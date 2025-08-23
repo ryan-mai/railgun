@@ -10,15 +10,18 @@ void main() {
 var fragmentShader = `
 varying vec2 vUv;
 uniform vec3 color;
-uniform float timeMsec; // A-Frame time in milliseconds.
+uniform vec3 gridColor;
+uniform float timeMsec;
 
 void main() {
-  float time = timeMsec / 1000.0; // Convert from A-Frame milliseconds to typical time in seconds.
-  gl_FragColor = mix(
-    vec4(mod(vUv , 0.05) * 20.0, 1.0, 1.0),
-    vec4(color, 1.0),
+  float time = timeMsec / 1000.0;
+  vec4 grid = vec4(mod(vUv , 0.05) * 10.0, 1.0, 1.0);
+  vec4 base = vec4(gridColor, 1.0);
+  vec3 newColor = vec3(sin(time));
+  gl_FragColor = 
+  grid,
     sin(time)
-  );
+  ;
 }
 `;
 AFRAME.registerShader('grid-glitch', {

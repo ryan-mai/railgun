@@ -38,9 +38,7 @@ async function updateScore(uid, score) {
                 console.warn('updateScore: failed to sync localStorage', lsErr);
             }
             
-            // Recompute ranks client-side since Cloud Function deployment requires Blaze.
-            // NOTE: Relaxing rules to allow client rank writes is less secure; consider reintroducing server-side
-            // rank computation when Blaze is available.
+
             try {
                 
                 console.debug('[updateScore] starting client-side rank recomputation');
@@ -49,7 +47,6 @@ async function updateScore(uid, score) {
                     const batch = firestore.batch();
                     let rank = 1;
                     let ops = 0;
-                    // Track the score and identity of the player in the rank above (since snapshot is ordered desc by score)
                     let aboveScore = Number.POSITIVE_INFINITY;
                     let aboveDocId = null;
                     let aboveName = null;
@@ -77,8 +74,6 @@ async function updateScore(uid, score) {
                             console.info('[updateScore] rank batch committed', { ops });
                         } catch (commitErr) {
                             console.error('[updateScore] failed to commit rank updates (permissions or network)', { err: commitErr, ops, snapshotSize: snapshot.size });
-                            // Hint: Missing or insufficient permissions means Firestore security rules block these writes.
-                            // Consider moving rank recomputation to a Cloud Function or adjusting rules for testing.
                         }
                     } else {
                         console.debug('[updateScore] no rank changes needed');

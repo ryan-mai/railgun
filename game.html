@@ -19,6 +19,8 @@
   <script src="js/timer.js"></script>
   <script src="js/gameScore.js"></script>
   <script src="js/collisionDetection.js"></script>
+  <script src="js/logout.js"></script>
+  <script src="js/audioGame.js"></script>
   </head>
   <body>
     <script>
@@ -58,7 +60,8 @@
       });
 
     </script>
-  <a-scene id="scene" stats style="visibility: hidden;">
+
+  <a-scene id="scene" stats auto-audio-resume style="visibility: hidden;">
 
         <a-assets>
             <img id="leaderboard" src="assets/images/leaderboard.png">
@@ -88,6 +91,8 @@
                   <a-image src="#start_bg" width="4" height="1.5" position="0 1.5 -6"></a-image>
         <a-entity troika-text="value: Start the game by hitting the sphere!; color: black" position="0 1 -5.9"></a-entity>
         </a-entity>
+                <a-entity id="target" class="clickable" clickable  geometry="primitive: sphere; radius: 0.25" material="shader:grid-glitch;"  position="0 0 -4" radius="0" sound="src: #shoot; volume= 2.0; on: click"></a-entity>
+
 
         <a-image id="leaderstats" src="#leaderboard_bg" width="6" height="4" position="-4.5 3.5 -6" rotation="0 45 0">
           <a-entity troika-text="value: Leaderboard; font: #futura; color: #fff; anchor: center; fontSize: 0.45" position="-1.3 1.2 0.5">
@@ -98,7 +103,7 @@
           <a-entity troika-text="value: 3.; font: #futura; color: #B5831F; anchor: left; fontSize: 0.45" position="-2.45 -0.9 0.5"></a-entity>
         </a-image>
 
-        <a-entity id="target" class="clickable" clickable  geometry="primitive: sphere; radius: 0.25" material="shader:grid-glitch;"  position="0 0 -4" radius="0" sound="src: #shoot; volume= 2.0; on: click"></a-entity>
+    <a-entity id="bgMusic" sound="src: #sao_op; autoplay: false; loop: true; positional: false; volume: 0"></a-entity>
         <a-entity id="player"
             position-reader
             nipple-controls="mode: static">

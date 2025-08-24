@@ -36,8 +36,6 @@ AFRAME.registerComponent('clickable', {
 
       try { localStorage.setItem('playerScore', String(scoreValue)); } catch (e) {}
       if (typeof updateScore === 'function') {
-        // Prefer the Players document id saved at account creation (playerId).
-        // This matches the doc created with db.collection('Players').add(...) in auth.js.
         const uid = localStorage.getItem('playerId') ||
                     (window && window.auth && window.auth.currentUser && window.auth.currentUser.uid) ||
                     localStorage.getItem('playerUid') ||
@@ -49,7 +47,6 @@ AFRAME.registerComponent('clickable', {
           console.error('updateScore threw/rejected for', uid, e);
         }
       } else {
-        // updateScore not present; nothing to do here.
       }
     });
   }

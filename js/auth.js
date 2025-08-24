@@ -178,7 +178,6 @@ AFRAME.registerComponent('anon-auth', {
                     console.info('[anon-auth] created player doc', { uid, name, score, rank });
                 }
 
-                // Duplicate cleanup: find docs missing uid with same name and log (optional manual cleanup)
                 try {
                     const dupQuery = await firestore.collection('Players').where('name','==', name).get();
                     let dupIds = [];

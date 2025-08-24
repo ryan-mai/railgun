@@ -27,30 +27,32 @@
 
     const leaderEl = document.getElementById('leaderstats');
     if (!leaderEl) return;
-    const lines = players.map((p, i) => `${p.name} — ${p.score}`);
-    console.log(lines)
-    for (let i = 0; i < 3; i++){
-      lineEl = document.createElement('a-entity')
-      lineEl.setAttribute('troika-text', {value: lines[i], fontSize: 0.2, color: '#fff', anchor: 'left'})
-      lineEl.object3D.position.x = -1.75
-      lineEl.object3D.position.y = 0.75 - i*0.75
-      lineEl.object3D.position.z = 0.05
+    console.debug('[game] rendering leaderboard entries', players);
 
-      leaderEl.appendChild(lineEl)
+    for (let i = 0; i < 3; i++) {
+      const p = players[i] || { name: '', score: 0 };
+      const display = `${p.name} — ${p.score}`;
+
+      const nameLen = (p.name || '').length;
+      const baseSize = 0.28;
+      const shrinkPerChar = 0.01;
+      const shrinkStart = 6;
+      const fontSize = Math.max(0.12, baseSize - Math.max(0, nameLen - shrinkStart) * shrinkPerChar);
+
+      const lineEl = document.createElement('a-entity');
+      lineEl.setAttribute('troika-text', { value: display, fontSize: fontSize, color: '#fff', anchor: 'left' });
+      lineEl.object3D.position.x = -1.75;
+      lineEl.object3D.position.y = 0.75 - i * 0.75;
+      lineEl.object3D.position.z = 0.05;
+
+      leaderEl.appendChild(lineEl);
     }
   });
 
-      AFRAME.registerComponent('aimbot', {
+      AFRAME.registerComponent('logout', {
         init: function () {
           this.el.addEventListener('click', function (evt) {
-            var aimbot = document.querySelector('#aimbot')
-            aimbot.setAttribute('text', {value: `AIMBOT ON`})
-
-            setTimeout(() => {
-              console.log('AIMBOT ACTIVATED!!! :)')
-              aimbot.setAttribute('text', {value: `:))) BYEEE!!`})
-              location.reload();
-            }, 4000);
+            window.location.href = "logout.html";
           });
         }
       });
@@ -69,6 +71,8 @@
           <img id="score_bg" src="assets/images/score.png">
           <img id="timer_bg" src="assets/images/timer.png">
           <img id="leaderboard_bg" src="assets/images/leaderboard.png">
+          <img id="logout_bg" src="assets/images/logout_button.png">
+          <img id="start_bg" src="assets/images/start_game.png">
           <a-asset-item id="futura" src="assets/fonts/futura_v2.ttf"></a-asset-item>
 
         </a-assets>
@@ -76,9 +80,15 @@
         <a-entity sound="src: #sao_op"></a-entity> 
         <a-entity gltf-model="#map" position="1.6 -50 -0.8" rotation="0 200 0" scale="1 1 1"></a-entity>
         <a-sky color="#000"></a-sky>
-        <a-plane class="aimbot" aimbot width="2" height="0.5" position="0 -5 -3" rotation="-75 0 0">
-          <a-entity id="aimbot" troika-text="value: aimbot; font: #futura; color: black; fontSize: 0.2; anchor: center" position="0 0 0"></a-entity>
-        </a-plane>
+        <a-image id="logout" logout class="logout" src="#logout_bg" width="5" height="1.25" position="0 -5 -3" rotation="-90 20 0">
+            <a-entity troika-text="value: Logout; font: #futura; color: white; fontSize: 0.75; anchor: center" position="-0.9 0 0.01"></a-entity>
+        </a-image>
+
+        <a-entity id="tip" position="0 1 -2">
+                  <a-image src="#start_bg" width="4" height="1.5" position="0 1.5 -6"></a-image>
+        <a-entity troika-text="value: Start the game by hitting the sphere!; color: black" position="0 1 -5.9"></a-entity>
+        </a-entity>
+
         <a-image id="leaderstats" src="#leaderboard_bg" width="6" height="4" position="-4.5 3.5 -6" rotation="0 45 0">
           <a-entity troika-text="value: Leaderboard; font: #futura; color: #fff; anchor: center; fontSize: 0.45" position="-1.3 1.2 0.5">
           </a-entity>
@@ -107,7 +117,7 @@
             <a-entity
               id="ray"
               cursor="fuse: true;"
-              raycaster="showLine: true; far: 50; lineColor: red; interval: 500; objects: .clickable, .aimbot;"
+              raycaster="showLine: true; far: 50; lineColor: red; interval: 500; objects: .clickable, .logout;"
               material="color: red; shader: flat"
               position="0 0 0"
               rotation="0 0 0">

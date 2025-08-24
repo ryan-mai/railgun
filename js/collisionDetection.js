@@ -18,9 +18,9 @@ AFRAME.registerComponent('clickable', {
 
       if (evt && evt.detail && evt.detail.intersection && evt.detail.intersection.point) {
         const p = evt.detail.intersection.point;
-        console.log('Hit At:', p.x.toFixed(2), p.y.toFixed(2), p.z.toFixed(2));
+        
       } else {
-        console.log('Hit event (no intersection.point):', evt && evt.detail ? evt.detail : evt);
+        
       }
 
       if (scoreValue === 1) {
@@ -44,7 +44,7 @@ AFRAME.registerComponent('clickable', {
                     null;
         try {
           const updated = await updateScore(uid, scoreValue);
-          console.info('collisionDetection: updateScore returned', updated, 'for', uid);
+          
         } catch (e) {
           console.error('updateScore threw/rejected for', uid, e);
         }

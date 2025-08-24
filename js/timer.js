@@ -1,6 +1,6 @@
 AFRAME.registerComponent('timer', {
     schema: {
-        duration: {type: 'number', default: 2}
+        duration: {type: 'number', default: 60}
     },
     init: function() {
         var scoreEl = document.querySelector('#score');
@@ -29,7 +29,7 @@ AFRAME.registerComponent('timer', {
             } else {
                 clearInterval(this.interval);
                 this.interval = null;
-                // window.location.reload();
+                window.location.reload();
             }
         }, 1000);
     },

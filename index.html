@@ -7,6 +7,7 @@
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="DRACOLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
+      <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
 
   </head>
   <body>
@@ -15,30 +16,40 @@
     <a-scene stats>
         <script>
         AFRAME.registerComponent('clickable', {
-            init: function () {
-            var loginEl = document.querySelector('#start_login');
-            var skyEl = document.querySelector('a-sky');
-            var sceneEl = document.querySelector('a-scene');
-            this.el.addEventListener('click', function (evt) {
-                sceneEl.removeChild(loginEl);
-                textEl = document.createElement('a-entity');
-                textEl.setAttribute('text', {value: 'Link Start'});
-                textEl.setAttribute('position', {x: 3.5, y:1.6, z:-5});
-                textEl.setAttribute('text', {width: 10, height: 10});
-                sceneEl.appendChild(textEl);
-                setTimeout(() => {
-                    var linkEl = document.querySelector('#start');
-                    skyEl.setAttribute('material', {src:'#start'});
-                    linkEl.play();
-                    sceneEl.removeChild(textEl)
-                    linkEl.addEventListener('ended', function() {
-                        skyEl.setAttribute('material', {color: '#000'});
-                        window.location.href = "login.html";
-                    })
-                }, 1500);
+      init: function () {
+      var skyEl = document.querySelector('a-sky');
+      var sceneEl = document.querySelector('a-scene');
+      this.el.addEventListener('click', function (evt) {
+        // Re-query the login container at click time to avoid stale references
+        var loginEl = document.querySelector('#start_login');
+        if (loginEl) {
+          // Prefer Element.remove() when available, otherwise remove via parent
+          if (typeof loginEl.remove === 'function') {
+            loginEl.remove();
+          } else if (loginEl.parentNode) {
+            loginEl.parentNode.removeChild(loginEl);
+          }
+        }
+        let textEl = document.createElement('a-entity');
+        textEl.setAttribute('text', {value: 'Link Start'});
+        textEl.setAttribute('position', {x: 3.5, y:1.6, z:-5});
+        textEl.setAttribute('text', {width: 10, height: 10});
+        sceneEl.appendChild(textEl);
+        setTimeout(() => {
+          var linkEl = document.querySelector('#start');
+          skyEl.setAttribute('material', {src:'#start'});
+          linkEl.play();
+          // remove the temporary text node
+          if (textEl && typeof textEl.remove === 'function') textEl.remove();
+          else if (textEl && textEl.parentNode) textEl.parentNode.removeChild(textEl);
+          linkEl.addEventListener('ended', function() {
+            skyEl.setAttribute('material', {color: '#000'});
+            window.location.href = "login.html";
+          })
+        }, 1500);
 
-                console.log('Hit At: ', evt.detail.intersection.point);
-            });
+        console.log('Hit At: ', evt.detail.intersection.point);
+      });
             }
         });            
         </script>
@@ -46,25 +57,50 @@
           <video id="start" src="assets/videos/start.mp4"></video>
           <img id="begin" src="assets/images/begin.jpg">
           <img id="login" src="assets/images/Login.png">
+            <img id="reticle" src="assets/images/reticle.png">
+          <img id="info_bg" src="assets/images/info.png">
+          <img id="mouse" src="assets/images/mouse.png">
+          <img id="mouse_click" src="assets/images/mouse_click.png">
         </a-assets>
-        <a-image id="start_login" class="clickable" clickable src="#login" height="1" width="8" position="0 1.6 -5">
-            <a-entity  text="value: Login; height: 10; width:10" position="1.5 0 0" color="#000">
-            </a-entity>
-        </a-image>
-
         <a-sky src="#begin" rotation="0 -90 0"></a-sky>
-        <a-entity camera
+        <a-entity id="start_login">
+          <a-image  class="clickable" clickable src="#login" height="1" width="8" position="0 2.5 -5">
+              <a-entity  troika-text="value: Login; fontSize: 0.5; anchor: left" position="-3.5 0.05 0.05" color="#000">
+              </a-entity>
+          </a-image>
+          <a-entity troika-text="value: Left Click, Press Down/Hold, & Drag Mouse; anchor:center; fontSize: 0.35" position="0 -0.9 -5"></a-entity>
+          <a-image src="#info_bg" width="10" height="3.5" position="0 -0.25 -6">
+          </a-image>
+          <a-image  src="#mouse_click" width="0.75" height="0.75" animation="property: width; to: 1; dur:1500; loop: true; dir: alternate"
+          animation__2="property: height; to: 1; dur:1500; loop: true; dir: alternate"
+          position="-3 0.5 -5.5"></a-image>
+          <a-image></a-image>
+          <a-image  src="#mouse" width="0.9" height="0.9" animation="property: position; to: 3.25 0.55 -5.5; dur:2250; easing: easeInOutCubic; loop: true; dir: alternate" position="-0.25 0.55 -5.5"></a-image>
+        </a-entity>
+        <a-entity id="player"
+            position-reader
+            nipple-controls="mode: static">
+        <a-entity
+            camera
             position="0 1.6 0"
             look-controls="true">
             <a-entity
-                id="ray"
-                cursor="fuse: true; rayOrigin: mouse"
-                raycaster="showLine: true; far: 50; lineColor: red; interval: 500; objects: .clickable;"
-                material="color: red; shader: flat"
-                position="0 -1.6 0"
-                rotation="0 0 0">
-            </a-entity>
+              id="ray"
+              cursor="fuse: true;"
+              raycaster="showLine: true; far: 50; lineColor: red; interval: 500; objects: .clickable"
+              material="color: red; shader: flat"
+              position="0 0 0"
+              rotation="0 0 0">
 
+              <a-image id="ret" src="#reticle"
+                      position="0 0 -10"
+                      width="2.5"
+                      height="2.5"
+                      rotation="0 0 0"
+                      material="src: #reticle; transparent: true; alphaTest: 0.01; depthTest: false;">
+              </a-image>
+            </a-entity>
+          </a-entity>
         </a-entity>
    </a-scene>
    <script>

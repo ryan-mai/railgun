@@ -98,7 +98,6 @@ AFRAME.registerComponent('user-auth', {
                 const score = 0;
                 const docRef = await firestore.collection('Players').add({ name, password, score, rank, lastUpdated: new Date().toISOString() });
                 console.info('auth.user-auth: created Players doc', { docId: docRef.id, name, score, rank });
-                // sign into Firebase (anonymous) so auth.onAuthStateChanged is triggered and we can attach uid to the player doc
                 let anonUid = null;
                 try {
                     const cred = await authInstance.signInAnonymously();
@@ -114,11 +113,11 @@ AFRAME.registerComponent('user-auth', {
                         console.warn('auth.user-auth: failed to merge uid into Players doc', mergeErr);
                     }
                 }
-                // set localStorage and move to game
+
                 try {
                     localStorage.setItem('playerLoggedIn', 'true');
                     localStorage.setItem('playerName', name);
-                    // Persist score and rank so game.html can read them immediately after redirect
+
                     localStorage.setItem('playerScore', score);
                     localStorage.setItem('playerRank', rank);
                     localStorage.setItem('playerId', docRef.id);
@@ -139,27 +138,74 @@ AFRAME.registerComponent('anon-auth', {
                 return;
             }
             window.__authProcessStarted = true;
-            // Call generateAnon and destructure the returned object
-            const { name, password, score, rank, id } = await generateAnon();
-            console.info('auth.anon-auth: generateAnon returned', { name, password, score, rank, id });
+            console.debug('[anon-auth] click received; starting anonymous auth flow');
+            const firestore = (window && window.db) || firebase.firestore();
+            const authInstance = (window && window.auth) || firebase.auth();
+            let uid = null;
             try {
-                const authInstance = (window && window.auth) || firebase.auth();
-                await authInstance.signInAnonymously();
-            } catch (e) {
-                console.warn('Anonymous sign-in failed:', e);
+                const cred = await authInstance.signInAnonymously();
+                uid = cred && cred.user ? cred.user.uid : (authInstance.currentUser && authInstance.currentUser.uid);
+                console.debug('[anon-auth] signed in anonymously', { uid });
+            } catch (signErr) {
+                console.error('[anon-auth] anonymous sign-in failed, aborting', signErr);
+                alert('Anonymous sign-in failed. See console.');
+                window.__authProcessStarted = false;
+                return;
             }
-            // Persist useful values locally and navigate to the game
+
             try {
-                localStorage.setItem('playerLoggedIn', 'true');
-                localStorage.setItem('playerName', name);
-                localStorage.setItem('playerPassword', password);
-                localStorage.setItem('playerId', id);
-                // Persist score and rank from generateAnon
-                localStorage.setItem('playerScore', score);
-                localStorage.setItem('playerRank', rank);
-            } catch (e) { console.error('auth.anon-auth: localStorage write failed', e); }
-            alert('[System] New Player Logged in | Username: ' + name + ' | Password: ' + password + ' | Score: ' + score + ' | Rank: ' + rank);
-            setTimeout(() => { window.location.href = 'game.html'; }, 250);
+                // Check if player doc already exists for this uid (should not, but avoid duplicates)
+                const playerDocRef = firestore.collection('Players').doc(uid);
+                const existing = await playerDocRef.get();
+                let name, password, score, rank;
+                if (existing.exists) {
+                    const data = existing.data() || {};
+                    console.warn('[anon-auth] player doc already existed for uid; reusing', { uid, data });
+                    name = data.name || 'Player';
+                    password = localStorage.getItem('playerPassword') || generatePass();
+                    score = typeof data.score === 'number' ? data.score : 0;
+                    rank = typeof data.rank === 'number' ? data.rank : 0;
+                } else {
+                    // Compute next rank: count players with rank > 0 to avoid including placeholder 0 entries.
+                    const snapAll = await firestore.collection('Players').get();
+                    let counted = 0;
+                    snapAll.forEach(d => { const r = d.data().rank; if (typeof r === 'number' && r > 0) counted++; });
+                    rank = counted + 1;
+                    score = 0;
+                    name = `Player ${rank}`;
+                    password = generatePass();
+                    await playerDocRef.set({ uid, name, password, score, rank, lastUpdated: new Date().toISOString() });
+                    console.info('[anon-auth] created player doc', { uid, name, score, rank });
+                }
+
+                // Duplicate cleanup: find docs missing uid with same name and log (optional manual cleanup)
+                try {
+                    const dupQuery = await firestore.collection('Players').where('name','==', name).get();
+                    let dupIds = [];
+                    dupQuery.forEach(doc => { const d = doc.data(); if (!d.uid || d.uid !== uid) dupIds.push(doc.id); });
+                    if (dupIds.length) {
+                        console.warn('[anon-auth] potential duplicate player docs detected (same name, different/no uid). Consider cleaning manually.', { name, dupIds });
+                    }
+                } catch (dupErr) {
+                    console.debug('[anon-auth] duplicate detection failed (non-fatal)', dupErr);
+                }
+
+                try {
+                    localStorage.setItem('playerLoggedIn', 'true');
+                    localStorage.setItem('playerName', name);
+                    localStorage.setItem('playerPassword', password);
+                    localStorage.setItem('playerId', uid); // id = uid now
+                    localStorage.setItem('playerUid', uid);
+                    localStorage.setItem('playerScore', String(score));
+                    localStorage.setItem('playerRank', String(rank));
+                } catch (lsErr) { console.error('[anon-auth] localStorage write failed', lsErr); }
+                alert('[System] New Player Logged in | Username: ' + name + ' | Password: ' + password + ' | Score: ' + score + ' | Rank: ' + rank);
+                setTimeout(() => { window.location.href = 'game.html'; }, 250);
+            } catch (flowErr) {
+                console.error('[anon-auth] flow error', flowErr);
+                alert('Anonymous auth flow failed. See console.');
+                window.__authProcessStarted = false;
+            }
         }, { once: true });
     }
 });

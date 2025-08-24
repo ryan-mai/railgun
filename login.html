@@ -5,7 +5,6 @@
     <title>Railgun</title>
     <meta name="description" content="Hello, World! - A-Frame">
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script src="DRACOLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
@@ -62,14 +61,20 @@
             <img id="submit_bg" src="assets/images/submit.png">
             <img id="google_bg" src="assets/images/google_login.png">
             <img id="skip_bg" src="assets/images/skip.png">
+            <img id="login_info" src="assets/images/login_bg.png">
         </a-asset-items>
       </a-assets>
+      <a-image src="#login_info" width="8" height="1.25" position="0 6.75 -5">
+            <a-entity troika-text="value: Account Setup ; color: white; fontSize:0.6" position="0 0.04 0.01"></a-entity>
+      </a-image>
+      <a-plane position="0 0.1 0">
         <a-image id="clickable-keyboard" src="#login_bg" width="8" height="1.5" position="-5 4 -5">
             <a-entity troika-text="value: Player: ; color: white; fontSize:0.6" position="-2.2 0.04 0.01"></a-entity>
             <a-plane position="1.2 0 0.01" width="4.5" height="0.75" color="#FFF"></a-plane>
             <a-entity id="userText" troika-text="value:; color: black; fontSize:0.5" position="-0.8 -0.03 0.1"></a-entity>
             <a-entity troika-text="value: 13 Letters Only!; color: red; fontSize:0.25" position="2.75 -0.6 0.1"></a-entity>
         </a-image>
+
     <a-image id="userAuth"  src="#submit_bg" class="userAuth clickable-auth" width="4" height="1.5" user-auth position="3 4 -5" scale="-1 1 1">
             <a-entity troika-text="value: Submit; color: white; fontSize:0.5" position="0.1 -0.01 0.01" scale="-1 1 1"></a-entity>
         </a-image>
@@ -163,6 +168,7 @@
         <a-image src="#backspace_bg" class="clickable-key" width="4" height="4" clickable-key position="-7.15 0.5 -5" scale="-1 1 1">
             <a-entity troika-text="value: Backspace; color: white; fontSize:0.5" position="0.5 -0.1 0.01" scale="-1 1 1"></a-entity>
         </a-image>
+        </a-plane>
         </a-plane>
         <a-sky color="#000"></a-sky>
         <a-entity id="player"

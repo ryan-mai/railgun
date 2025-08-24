@@ -5,120 +5,41 @@
     <title>Railgun</title>
     <meta name="description" content="Hello, World! - A-Frame">
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script src="DRACOLoader.js"></script>
+    <script src="js/DRACOLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
-    <script src="shader-grid-glitch.js"></script>
+    <script src="js/shader-grid-glitch.js"></script>
+    <script src="js/leaderboard.js"></script>
     <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-  <script src="firebase-config.js"></script>
-
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/checkAuth.js"></script>
+  <script src="js/updateScore.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/gameScore.js"></script>
+  <script src="js/collisionDetection.js"></script>
   </head>
   <body>
     <script>
-      document.documentElement.classList.add('auth-pending');
-      try {
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        auth.onAuthStateChanged((user) => {
-          const sceneEl = document.querySelector('#scene');
-          console.log('onAuthStateChanged -> user:', user);
-          console.log('firebase.auth().currentUser:', firebase.auth().currentUser);
-          console.log('localStorage before handling:', {
-            playerLoggedIn: localStorage.getItem('playerLoggedIn'),
-            playerName: localStorage.getItem('playerName'),
-            playerRank: localStorage.getItem('playerRank'),
-            playerScore: localStorage.getItem('playerScore'),            
-          });
-          if (!user) {
-            console.log('No authenticated user detected — redirecting to login.html');
-            try { localStorage.removeItem('playerLoggedIn'); } catch (e) {}
-            window.location.href = 'login.html';
-            return;
-          }
-          try {
-            localStorage.setItem('playerLoggedIn', 'true');
-            const providedName = user.displayName || user.email;
-            if (providedName) {
-              localStorage.setItem('playerName', providedName);
-            }
-          } catch (e) {}
-          console.log('Authenticated — stored player info:', {
-            playerLoggedIn: localStorage.getItem('playerLoggedIn'),
-            playerName: localStorage.getItem('playerName'),
-            playerScore: localStorage.getItem('playerScore'),
-            playerRank: localStorage.getItem('playerRank'),
-            uid: user.uid
-          });
-          if (sceneEl) sceneEl.style.visibility = 'visible';
-          document.documentElement.classList.remove('auth-pending');
-        });
-      } catch (e) {
-        console.warn('Firebase init failed or already initialized.', e);
-        // If Firebase is unavailable, allow scene for local testing
-        const sceneEl = document.querySelector('#scene');
-        if (sceneEl) sceneEl.style.visibility = 'visible';
-        document.documentElement.classList.remove('auth-pending');
-      }
-      AFRAME.registerComponent('timer', {
-        schema: {
-          duration: {type: 'number', default: 61}
-        },
-        init: function() {
-          this.timeLeft = this.data.duration;
-          this.timerEl = this.el;
-          this.interval = setInterval(() => {
-            if (this.timeLeft > 0) {
-              this.timeLeft--;
-              this.timerEl.setAttribute('troika-text', {value: `${this.timeLeft}s`});
-            } else {
-              clearInterval(this.interval);
-              location.reload();
-            }
-          }, 1000);
-        },
-        remove: function() {
-          clearInterval(this.interval);
-        }
-      });
-      AFRAME.registerComponent('updateScore', {
-        schema: {
-          target: { type: 'selector', default: '#score' },
-          base: { type: 'number', default: 0 }
-        },
-        init: function () {
-          this.score = this.data.target;
-        },
-        tick: function () {
-          this.el.addEventListener
-          this.score.object3D.position.x = this.data.baseX + playerX;
-        }
-      });
-      function getRnd(min, max) {
-        return Math.floor(Math.random() * (max - min) ) + min;
-      }
-AFRAME.registerComponent('clickable', {
-  schema: {
-    score: { type: 'number', default: 0 },
-  },
-  init: function () {
-    var target = document.querySelector('#target');
-    var scoreEl = document.querySelector('#score');
-    var scoreValue = 0;
+  getTopPlayers().then(players => {
+    if (!players || players.length === 0) return;
 
-    var lastIndex = -1;
-    var COLORS = ['red', 'green', 'blue'];
-    this.el.addEventListener('click', function (evt) {
-      lastIndex = (lastIndex + 1) % COLORS.length;
-      this.setAttribute('material', 'color', COLORS[lastIndex]);
-      target.object3D.position.x = getRnd(-5,5);
-      target.object3D.position.y = getRnd(-5,5);
-      scoreValue += 1;
-      scoreEl.setAttribute('troika-text', {value: `Score: ${scoreValue}`});
-      console.log('Hit At: ', evt.detail.intersection.point);
-    });
-  }
-});
+    const leaderEl = document.getElementById('leaderstats');
+    if (!leaderEl) return;
+    const lines = players.map((p, i) => `${p.name} — ${p.score}`);
+    console.log(lines)
+    for (let i = 0; i < 3; i++){
+      lineEl = document.createElement('a-entity')
+      lineEl.setAttribute('troika-text', {value: lines[i], fontSize: 0.2, color: '#fff', anchor: 'left'})
+      lineEl.object3D.position.x = -1.75
+      lineEl.object3D.position.y = 0.75 - i*0.75
+      lineEl.object3D.position.z = 0.05
+
+      leaderEl.appendChild(lineEl)
+    }
+  });
+
       AFRAME.registerComponent('aimbot', {
         init: function () {
           this.el.addEventListener('click', function (evt) {
@@ -133,12 +54,6 @@ AFRAME.registerComponent('clickable', {
           });
         }
       });
-    document.addEventListener('DOMContentLoaded', function() {
-      var sceneEl = document.querySelector('a-scene');
-      var reticleEl = document.querySelector("#ret");
-      var rayEl = document.querySelector("ray");
-    });
-    
 
     </script>
   <a-scene id="scene" stats style="visibility: hidden;">
@@ -153,6 +68,7 @@ AFRAME.registerComponent('clickable', {
           <img id="reticle" src="assets/images/reticle.png">
           <img id="score_bg" src="assets/images/score.png">
           <img id="timer_bg" src="assets/images/timer.png">
+          <img id="leaderboard_bg" src="assets/images/leaderboard.png">
           <a-asset-item id="futura" src="assets/fonts/futura_v2.ttf"></a-asset-item>
 
         </a-assets>
@@ -163,6 +79,15 @@ AFRAME.registerComponent('clickable', {
         <a-plane class="aimbot" aimbot width="2" height="0.5" position="0 -5 -3" rotation="-75 0 0">
           <a-entity id="aimbot" troika-text="value: aimbot; font: #futura; color: black; fontSize: 0.2; anchor: center" position="0 0 0"></a-entity>
         </a-plane>
+        <a-image id="leaderstats" src="#leaderboard_bg" width="6" height="4" position="-4.5 3.5 -6" rotation="0 45 0">
+          <a-entity troika-text="value: Leaderboard; font: #futura; color: #fff; anchor: center; fontSize: 0.45" position="-1.3 1.2 0.5">
+          </a-entity>
+          <a-entity troika-text="value: 1.; font: #futura; color: #F5E427; anchor: left; fontSize: 0.45" position="-2.5 0.5 0.5">
+          </a-entity>
+          <a-entity troika-text="value: 2.; font: #futura; color: #F2F2F2; anchor: left; fontSize: 0.45" position="-2.5 -0.1 0.2"></a-entity>
+          <a-entity troika-text="value: 3.; font: #futura; color: #B5831F; anchor: left; fontSize: 0.45" position="-2.45 -0.9 0.5"></a-entity>
+        </a-image>
+
         <a-entity id="target" class="clickable" clickable  geometry="primitive: sphere; radius: 0.25" material="shader:grid-glitch;"  position="0 0 -4" radius="0" sound="src: #shoot; volume= 2.0; on: click"></a-entity>
         <a-entity id="player"
             position-reader

@@ -11,9 +11,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="passwordGenerator.js"></script>
-    <script src="anonGenerator.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/passwordGenerator.js"></script>
+    <script src="js/anonGenerator.js"></script>
+    <script src="js/auth.js"></script>
   </head>
   <body>
 
@@ -24,124 +25,6 @@
         const auth = firebase.auth();
         auth.languageCode = 'it';
 
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                try { localStorage.setItem('playerLoggedIn', 'true'); } catch (e) {}
-                window.location.href = 'game.html';
-            }
-        });
-
-    AFRAME.registerComponent('google-auth', {
-        init: function() {
-            this.el.addEventListener('click', async (e) => {
-                try {
-                    const result = await firebase.auth().signInWithPopup(provider);
-                    const user = result.user;
-                    const playername = prompt('[System] Enter your playername:', user.displayName || '');
-
-                    const querySnapshot = await db.collection('Players').get();
-                    let exists = false;
-                    querySnapshot.forEach(doc => {
-                        if (doc.data().name === playername) exists = true;
-                    });
-
-                    if (exists) {
-                        alert('User already exists!');
-                        return;
-                    }
-
-                    const rank = querySnapshot.size + 1;
-                    const score = 0;
-                    await db.collection('Players').add({ name: playername, score, rank });
-                    try {
-                        localStorage.setItem('playerLoggedIn', 'true');
-                        localStorage.setItem('playerName', playername);
-                        localStorage.setItem('playerScore', score);
-                        localStorage.setItem('playerRank', rank);
-                    } catch (e) {}
-                    alert('[System] New Player Logged in | Username: ' + playername + ' | Score: ' + score + ' | Rank: ' + rank);
-                    window.location.href = 'game.html';
-                } catch (error) {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    const email = error.customData?.email;
-                    const credential = firebase.auth.GoogleAuthProvider.credentialFromError(error);
-                    console.error('Google sign-in error', errorCode, errorMessage, email, credential);
-                }
-            }, { once: true });
-        }
-    });
-
-    AFRAME.registerComponent('user-auth', {
-        init: function(){
-            this.el.addEventListener('click', async (e) => { 
-                var playername = document.querySelector('#userText').getAttribute('troika-text').value;
-                if (playername.length > 0) {
-                    const name = playername;
-                    const password = generatePass();
-
-                    const querySnapshot = await db.collection("Players").get();
-                    let exists = false;
-                    querySnapshot.forEach(doc => {
-                        if (doc.data().name === name) exists = true;
-                    });
-
-                    if (exists) {
-                        alert('User already exists!');
-                        return;
-                    }
-
-                    const rank = querySnapshot.size + 1;
-                    const score = 0;
-                    await db.collection('Players').add({ name, password, score, rank });
-                    // sign into Firebase (anonymous) so auth.onAuthStateChanged is triggered
-                    try {
-                        await auth.signInAnonymously();
-                    } catch (e) {
-                        console.warn('Anonymous sign-in failed after user creation:', e);
-                    }
-                    // set localStorage and move to game
-                    try {
-                        localStorage.setItem('playerLoggedIn', 'true');
-                        localStorage.setItem('playerName', name);
-                        // Persist score and rank so game.html can read them immediately after redirect
-                        localStorage.setItem('playerScore', score);
-                        localStorage.setItem('playerRank', rank);
-                    } catch (e) {}
-                    alert('[System] New Player Logged in | Username: ' + name + ' | Password: ' + password + ' | Score: ' + score + ' | Rank: ' + rank);
-                    window.location.href = 'game.html';
-                }
-            });
-        }
-    }, { once: true });
-
-    AFRAME.registerComponent('anon-auth', {
-        init: function(){
-            this.el.addEventListener('click', async (e) => { 
-                // Call generateAnon and destructure the returned object
-                const { name, password, score, rank, id } = await generateAnon();
-                console.log( name, password, score, rank, id)
-                try {
-                    await auth.signInAnonymously();
-                } catch (e) {
-                    console.warn('Anonymous sign-in failed:', e);
-                }
-                // Persist useful values locally and navigate to the game
-                try {
-                    localStorage.setItem('playerLoggedIn', 'true');
-                    localStorage.setItem('playerName', name);
-                    localStorage.setItem('playerPassword', password);
-                    localStorage.setItem('playerId', id);
-                    // Persist score and rank from generateAnon
-                    localStorage.setItem('playerScore', score);
-                    localStorage.setItem('playerRank', rank);
-                } catch (e) {}
-                alert('[System] New Player Logged in | Username: ' + name + ' | Password: ' + password + ' | Score: ' + score + ' | Rank: ' + rank);
-                setTimeout(() => { window.location.href = 'game.html'; }, 250);
-            }, { once: true });
-        }
-    });
-        
         AFRAME.registerComponent('clickable-key', {
         init: function () {
             this.el.addEventListener('click', async () => {

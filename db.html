@@ -15,6 +15,10 @@
   <button type="button" id="submitData">Submit</button>
   <button type="button" id="getData">Get Data</button>
   <button type="button" id="googleAuth">Continue with Google</button>
+  <br>
+  <label for="newName">New Name:</label>
+  <input type="text" id="newName" placeholder="enter new name">
+  <button type="button" id="updateName">Update Name</button>
 </form>
 <script type="module">
   // Import the functions you need from the SDKs you need
@@ -113,6 +117,51 @@ document.getElementById('getData').addEventListener('click', async (e) => {
     alert("User not found.");
   }
 
+});
+
+// Update player name handler
+document.getElementById('updateName').addEventListener('click', async (e) => {
+  const oldName = document.getElementById('name').value?.trim();
+  const newName = document.getElementById('newName').value?.trim();
+
+  if (!oldName) {
+    alert('Please enter the current player name in the "Player Name" field.');
+    return;
+  }
+  if (!newName) {
+    alert('Please enter a new name in the "New Name" field.');
+    return;
+  }
+
+  // Load all players once to check duplicates and find the target doc
+  const querySnapshot = await getDocs(collection(db, "Players"));
+  let targetDoc = null;
+  let duplicate = false;
+
+  querySnapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    if (data.name === oldName) {
+      targetDoc = { id: docSnap.id, data };
+    }
+    if (data.name === newName) {
+      duplicate = true;
+    }
+  });
+
+  if (!targetDoc) {
+    alert('Player with name "' + oldName + '" not found.');
+    return;
+  }
+
+  if (duplicate) {
+    alert('The chosen new name is already taken. Pick another name.');
+    return;
+  }
+
+  // Perform the update
+  const playerRef = doc(db, 'Players', targetDoc.id);
+  await updateDoc(playerRef, { name: newName });
+  alert('Player name updated from "' + oldName + '" to "' + newName + '"');
 });
 </script>
 </body>

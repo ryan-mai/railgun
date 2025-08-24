@@ -68,7 +68,6 @@
         </a-entity>
    </a-scene>
    <script>
-    // mark that start was visited and redirect if already logged in
     try { localStorage.setItem('visitedStart', 'true'); } catch (e) {}
     try {
       if (localStorage.getItem('playerLoggedIn') === 'true') {

@@ -18,41 +18,7 @@ async function updateScore(uid, score) {
             return false;
         });
 
-        // If we updated the player's high score, recompute ranks for all players.
-        if (updated) {
-            console.info('updateScore: player score increased, recomputing ranks...');
-            try {
-                const snapshot = await firestore.collection('Players').orderBy('score', 'desc').get();
-                console.debug('updateScore: fetched players for ranking, count=', snapshot.size);
-                if (!snapshot.empty) {
-                    const batch = firestore.batch();
-                    let rank = 1;
-                    const plannedUpdates = [];
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        // Log the current doc state
-                        console.debug('updateScore: player', { id: doc.id, score: data.score, rank: data.rank });
-                        // Only update if rank differs to reduce writes
-                        if (data.rank !== rank) {
-                            plannedUpdates.push({ id: doc.id, from: data.rank, to: rank });
-                            batch.update(doc.ref, { rank: rank });
-                        }
-                        rank++;
-                    });
-                    if (plannedUpdates.length === 0) {
-                        console.info('updateScore: no rank changes required');
-                    } else {
-                        console.info('updateScore: committing rank updates', plannedUpdates);
-                        await batch.commit();
-                        console.info('updateScore: rank updates committed');
-                    }
-                } else {
-                    console.info('updateScore: no players found when recomputing ranks');
-                }
-            } catch (rankErr) {
-                console.error('updateScore: failed to recompute ranks', rankErr);
-            }
-        }
+    // Rank recomputation moved to a Cloud Function in production for security.
 
         return updated;
     } catch (e) {

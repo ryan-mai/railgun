@@ -1,0 +1,40 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Production rules: require authentication, validate Players data, and
+    // deny everything else by default.
+
+    match /Players/{playerId} {
+      // Only authenticated users can read players
+      allow read: if request.auth != null;
+
+      // Allow creating a player document when the authenticated user is the owner.
+      // Require basic field types and that initial score is 0.
+      allow create: if request.auth != null
+        && (playerId == request.auth.uid || request.resource.data.uid == request.auth.uid)
+        && request.resource.data.name is string
+        && request.resource.data.score is int
+        && request.resource.data.score == 0
+        && request.resource.data.rank is int
+        && request.resource.data.rank >= 0;
+
+      // Allow updates only by the owner. Only allow increasing the score; forbid
+      // client-side rank/name changes. (Rank recomputed server-side.)
+      allow update: if request.auth != null
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.score is int
+        && request.resource.data.score >= resource.data.score
+        && request.resource.data.name == resource.data.name
+        && request.resource.data.rank == resource.data.rank;
+
+      // Disallow deletes from clients.
+      allow delete: if false;
+    }
+
+    // Deny access to any other collections/documents by default.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

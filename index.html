@@ -63,6 +63,7 @@
           <img id="mouse" src="assets/images/mouse.png">
           <img id="mouse_click" src="assets/images/mouse_click.png">
           <img id="banner" src="assets/images/railgun_banner.png">
+          
         </a-assets>
         <a-sky src="#begin" rotation="0 -90 0"></a-sky>
         <a-entity id="start_login" position="0 0 0">
@@ -72,7 +73,9 @@
               <a-entity  troika-text="value: Login; fontSize: 0.5; anchor: left" position="-3.5 0.05 0.05" color="#000">
               </a-entity>
           </a-image>
-          <a-entity troika-text="value: Left Click, Press Down/Hold, & Drag Mouse; anchor:center; fontSize: 0.35" position="0 -0.9 -5"></a-entity>
+          <a-entity troika-text="value: Left Click, Press Down/Hold, & Drag Mouse; anchor:center; fontSize: 0.15" position="1 -0.2 -5"></a-entity>
+          <a-entity troika-text="value: Aim/Move your cursor/mouse to the Login button to start (Gaze-Based/No Clicking); anchor:center; fontSize: 0.2" position="0 -0.9 -4.99"></a-entity>
+
           <a-image src="#info_bg" width="10" height="3.5" position="0 -0.25 -6">
           </a-image>
           <a-image  src="#mouse_click" width="0.75" height="0.75" animation="property: width; to: 1; dur:1500; loop: true; dir: alternate"

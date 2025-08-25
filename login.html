@@ -45,13 +45,17 @@
             <img id="skip_bg" src="assets/images/skip.png">
             <img id="login_info" src="assets/images/login_bg.png">
             <audio id="sao_op" src="assets/sounds/sao_op.mp3" preload="auto"></audio>
-
+            <img id="tip" src="assets/images/Login.png">
         </a-asset-items>
       </a-assets>
       <a-entity sound="src: #sao_op; autoplay: true; loop: true; volume: 0.5; positional: false"></a-entity>
+      <a-image src="#tip" width="13" height="1.75" position="-1 5.5 -6">
+            <a-entity troika-text="value: Move your cursor to type letters, or to click Google Signup or Skip Login; color: white; anchor:left; fontSize:0.35" position="-6 0.3 0.01"></a-entity>
+      </a-image>
       <a-image src="#login_info" width="8" height="1.25" position="0 6.75 -5">
             <a-entity troika-text="value: Account Setup ; color: white; fontSize:0.6" position="0 0.04 0.01"></a-entity>
       </a-image>
+
       <a-plane position="0 0.1 0">
         <a-image id="clickable-keyboard" src="#login_bg" width="8" height="1.5" position="-5 4 -5">
             <a-entity troika-text="value: Player: ; color: white; fontSize:0.6" position="-2.2 0.04 0.01"></a-entity>

@@ -90,10 +90,10 @@
         </a-image>
 
         <a-entity id="tip" position="0 1 -2">
-            <a-image src="#start_bg" width="4" height="1.5" position="0 1.5 -6"></a-image>
-        <a-entity troika-text="value: Start the game by hitting the sphere!; color: black" position="0 1 -5.9"></a-entity>
+            <a-image src="#start_bg" width="8" height="3" position="0 0.5 -6"></a-image>
+        <a-entity troika-text="value: Move your cursor to aim and shoot the sphere above! (No Need to Click); color: black; fontSize: 0.22" position="0 -0.5 -5.9"></a-entity>
         </a-entity>
-                <a-entity id="target" class="clickable" clickable  geometry="primitive: sphere; radius: 0.25" material="shader:grid-glitch;"  position="0 0 -4" radius="0" sound="src: #shoot; volume= 2.0; on: click"></a-entity>
+                <a-entity id="target" class="clickable" clickable  geometry="primitive: sphere; radius: 0.25" material="shader:grid-glitch;"  position="0 2.65 -4" radius="0" sound="src: #shoot; volume= 2.0; on: click"></a-entity>
 
 
         <a-image id="leaderstats" src="#leaderboard_bg" width="6" height="4" position="-4.5 3.5 -6" rotation="0 45 0">

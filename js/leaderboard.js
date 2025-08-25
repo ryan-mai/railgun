@@ -17,8 +17,8 @@ async function getTopPlayers() {
   console.debug('[leaderboard] doc', { id: doc.id, name: data.name, rank: data.rank, score: data.score });
     topPlayers.push(data);
   });
-  console.info('[leaderboard] topPlayers computed', topPlayers);
-  
+  // console.info('[leaderboard] topPlayers computed', topPlayers);
+
   return topPlayers;
       } catch (e) {
     console.error("[leaderboard] Error fetching leaderboard:", e);
@@ -30,7 +30,7 @@ document.addEventListener('first-hit', function() {
   const lb = document.querySelector("#leaderstats")
   if (typeof lb.setAttribute === 'function') lb.setAttribute('visible', false);
   if (lb.style) lb.style.display = 'none';
-  // Also hide the on-screen tip when the game starts
+
   try {
     const tip = document.querySelector('#tip');
     if (tip) {

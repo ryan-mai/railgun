@@ -1,7 +1,4 @@
 async function generateAnon(){
-    // Only skip if the player is already marked logged in. Do NOT bail out simply because
-    // a global auth flag was set (that flag is set by the caller before calling
-    // generateAnon and caused generateAnon to return a stale fallback value).
     if (typeof localStorage !== 'undefined' && localStorage.getItem('playerLoggedIn') === 'true') {
         console.info('generateAnon: skipped because user logged in');
         return { name: localStorage.getItem('playerName') || 'Player', password: localStorage.getItem('playerPassword') || '', score: Number(localStorage.getItem('playerScore')) || 0, rank: Number(localStorage.getItem('playerRank')) || 0, id: localStorage.getItem('playerId') || null };

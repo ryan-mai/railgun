@@ -22,25 +22,23 @@ init: function () {
                 sc.sceneEl.audioListener.context.resume();
                 resumed = true;
             }
-            } catch (e) { /* ignore */ }
+            } catch (e) {  }
         });
         }
         if (el && el.audioListener && el.audioListener.context && el.audioListener.context.state === 'suspended') {
         el.audioListener.context.resume();
         resumed = true;
         }
-    } catch (e) { /* ignore */ }
+    } catch (e) {  }
 
-    // Find our bg music entity (id="bgMusic") and start it with a fade-in
     var bg = document.getElementById('bgMusic');
     if (!bg) bg = document.querySelector('a-entity[sound]');
     if (bg && bg.components && bg.components.sound) {
         try {
         bg.setAttribute('sound', 'volume', 0);
         bg.components.sound.playSound();
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
 
-        // Fade to targetVolume
         try {
         var start = Date.now();
         var interval = 50;
@@ -52,7 +50,7 @@ init: function () {
             if (t < 1) setTimeout(step, interval);
         };
         step();
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
     }
     };
 

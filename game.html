@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <title>Railgun</title>
     <meta name="description" content="Hello, World! - A-Frame">
+  <link rel="icon" type="image/x-icon" href="assets/images/railgun_logo.ico">
+
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="js/DRACOLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
@@ -88,7 +90,7 @@
         </a-image>
 
         <a-entity id="tip" position="0 1 -2">
-                  <a-image src="#start_bg" width="4" height="1.5" position="0 1.5 -6"></a-image>
+            <a-image src="#start_bg" width="4" height="1.5" position="0 1.5 -6"></a-image>
         <a-entity troika-text="value: Start the game by hitting the sphere!; color: black" position="0 1 -5.9"></a-entity>
         </a-entity>
                 <a-entity id="target" class="clickable" clickable  geometry="primitive: sphere; radius: 0.25" material="shader:grid-glitch;"  position="0 0 -4" radius="0" sound="src: #shoot; volume= 2.0; on: click"></a-entity>
@@ -109,7 +111,7 @@
             nipple-controls="mode: static">
         <a-entity
             camera
-            position="0 0.9 0"
+            position="0 1 0"
             look-controls="true">
             <a-image id="timer_plane" src="#timer_bg" width="4" height="1" position="0.0 3.25 -5">
                 <a-entity id="time" timer troika-text="value: 60s; font: #futura; color: #fff; anchor: center; fontSize: 0.35" position="0 -0.3 0.5"></a-entity>
@@ -118,7 +120,7 @@
               <a-entity id="score" troika-text="value: Score: 0; font: #futura; fontSize: 0.35; color: #fff; anchor: center" position="-0.7 -0.3 0.5">
               </a-entity>
             </a-image>
-            <a-entity gltf-model="#sinon" animation-mixer="loop: repeat;" position="0 -1 0" scale="2 2 2" rotation="0 180 0"></a-entity>
+            <a-entity gltf-model="#sinon" animation-mixer="loop: repeat;" position="0 -0.9 -0.7" scale="2 2 2" rotation="0 180 0"></a-entity>
             <a-entity
               id="ray"
               cursor="fuse: true;"

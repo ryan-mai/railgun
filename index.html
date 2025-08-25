@@ -4,8 +4,9 @@
     <meta charset="utf-8">
     <title>Railgun</title>
     <meta name="description" content="Hello, World! - A-Frame">
+  <link rel="icon" type="image/x-icon" href="assets/images/railgun_logo.ico">
+
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script src="DRACOLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
       <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
 
@@ -20,10 +21,10 @@
       var skyEl = document.querySelector('a-sky');
       var sceneEl = document.querySelector('a-scene');
       this.el.addEventListener('click', function (evt) {
-        // Re-query the login container at click time to avoid stale references
+
         var loginEl = document.querySelector('#start_login');
         if (loginEl) {
-          // Prefer Element.remove() when available, otherwise remove via parent
+
           if (typeof loginEl.remove === 'function') {
             loginEl.remove();
           } else if (loginEl.parentNode) {
@@ -39,7 +40,7 @@
           var linkEl = document.querySelector('#start');
           skyEl.setAttribute('material', {src:'#start'});
           linkEl.play();
-          // remove the temporary text node
+
           if (textEl && typeof textEl.remove === 'function') textEl.remove();
           else if (textEl && textEl.parentNode) textEl.parentNode.removeChild(textEl);
           linkEl.addEventListener('ended', function() {
@@ -61,9 +62,11 @@
           <img id="info_bg" src="assets/images/info.png">
           <img id="mouse" src="assets/images/mouse.png">
           <img id="mouse_click" src="assets/images/mouse_click.png">
+          <img id="banner" src="assets/images/railgun_banner.png">
         </a-assets>
         <a-sky src="#begin" rotation="0 -90 0"></a-sky>
-        <a-entity id="start_login">
+        <a-image src="#banner" position="0 4.5 -5" width="6" height="1.75"></a-image>
+        <a-entity id="start_login" position="0 0 0">
           <a-image  class="clickable" clickable src="#login" height="1" width="8" position="0 2.5 -5">
               <a-entity  troika-text="value: Login; fontSize: 0.5; anchor: left" position="-3.5 0.05 0.05" color="#000">
               </a-entity>

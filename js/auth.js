@@ -36,7 +36,6 @@ AFRAME.registerComponent('google-auth', {
                 const rank = querySnapshot.size + 1;
                 const score = 0;
 
-                // Use auth UID as document id so it's easy to link account -> player doc
                 const playerDocRef = firestore.collection('Players').doc(user.uid);
                 const existingDoc = await playerDocRef.get();
                 if (existingDoc.exists) {
@@ -52,7 +51,7 @@ AFRAME.registerComponent('google-auth', {
                     localStorage.setItem('playerName', playername);
                     localStorage.setItem('playerScore', score);
                     localStorage.setItem('playerRank', rank);
-                    localStorage.setItem('playerId', user.uid); // store auth uid as playerId
+                    localStorage.setItem('playerId', user.uid); 
                 } catch (e) { console.error('auth.google-auth: localStorage write failed', e); }
 
                 alert('[System] New Player Logged in | Username: ' + playername + ' | Score: ' + score + ' | Rank: ' + rank);
@@ -154,7 +153,7 @@ AFRAME.registerComponent('anon-auth', {
             }
 
             try {
-                // Check if player doc already exists for this uid (should not, but avoid duplicates)
+
                 const playerDocRef = firestore.collection('Players').doc(uid);
                 const existing = await playerDocRef.get();
                 let name, password, score, rank;
@@ -166,7 +165,7 @@ AFRAME.registerComponent('anon-auth', {
                     score = typeof data.score === 'number' ? data.score : 0;
                     rank = typeof data.rank === 'number' ? data.rank : 0;
                 } else {
-                    // Compute next rank: count players with rank > 0 to avoid including placeholder 0 entries.
+
                     const snapAll = await firestore.collection('Players').get();
                     let counted = 0;
                     snapAll.forEach(d => { const r = d.data().rank; if (typeof r === 'number' && r > 0) counted++; });
@@ -193,7 +192,7 @@ AFRAME.registerComponent('anon-auth', {
                     localStorage.setItem('playerLoggedIn', 'true');
                     localStorage.setItem('playerName', name);
                     localStorage.setItem('playerPassword', password);
-                    localStorage.setItem('playerId', uid); // id = uid now
+                    localStorage.setItem('playerId', uid); 
                     localStorage.setItem('playerUid', uid);
                     localStorage.setItem('playerScore', String(score));
                     localStorage.setItem('playerRank', String(rank));

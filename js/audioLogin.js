@@ -33,7 +33,7 @@ init: function () {
                                         sc.sceneEl.audioListener.context.resume().then(function () { console.log('[user-audio-unlock] resumed sceneEl.audioListener.context'); });
                                         resumed = true;
                                     }
-                                } catch (e) { /* ignore */ }
+                                } catch (e) {  }
                             });
                         }
                         try {
@@ -44,7 +44,7 @@ init: function () {
                         } catch (e) {}
                         if (!resumed) console.log('[user-audio-unlock] no suspended audio context found to resume');
                     } catch (e) { console.warn('[user-audio-unlock] resume attempt failed', e); }
-        // remove listeners
+
         window.removeEventListener('click', tryPlay);
         window.removeEventListener('touchstart', tryPlay);
         window.removeEventListener('keydown', tryPlay);

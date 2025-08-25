@@ -5,7 +5,6 @@ async function updateScore(uid, score) {
 
         const uidToUse = (typeof uid === 'function') ? uid() : uid || (window && window.auth && window.auth.currentUser && window.auth.currentUser.uid) || localStorage.getItem('playerUid') || localStorage.getItem('playerId');
         if (!uidToUse) throw new Error('No user UID provided or available.');
-        
 
         const docRef = firestore.collection('Players').doc(uidToUse);
 
@@ -14,33 +13,31 @@ async function updateScore(uid, score) {
             const snap = await tx.get(docRef);
             const current = (snap.exists && typeof snap.data().score === 'number') ? snap.data().score : -Infinity;
             console.debug('[updateScore] transaction read', { docId: docRef.id, currentRemoteScore: current });
-            
+
             const newScore = Number(score);
             if (!isNaN(newScore) && newScore > current) {
                 tx.set(docRef, { score: newScore, lastUpdated: new Date().toISOString() }, { merge: true });
                 console.debug('[updateScore] staging score update', { docId: docRef.id, newScore });
-                
+
                 return { updated: true, newScore };
             }
-            
+
             return { updated: false, newScore: current };
         });
 
-    // Rank recomputation moved to a Cloud Function in production for security.
         if (updated && updated.updated) {
             try {
                 const prevLocal = parseInt(localStorage.getItem('playerScore') || '0', 10);
                     if (updated.newScore > prevLocal) {
                     localStorage.setItem('playerScore', String(updated.newScore));
-                    
+
                 }
             } catch (lsErr) {
                 console.warn('updateScore: failed to sync localStorage', lsErr);
             }
-            
 
             try {
-                
+
                 console.debug('[updateScore] starting client-side rank recomputation');
                 const snapshot = await firestore.collection('Players').orderBy('score', 'desc').get();
                 if (snapshot && snapshot.size > 0) {
@@ -55,14 +52,13 @@ async function updateScore(uid, score) {
                         const currentScore = (typeof data.score === 'number') ? data.score : -Infinity;
                         const isGreaterThanAbove = currentScore > aboveScore;
                         console.debug('[updateScore] rank pass', { rankCandidate: rank, docId: doc.id, name: data.name, score: currentScore, isGreaterThanAbove, aboveScore, aboveDocId });
-                        
 
                         if (data.rank !== rank) {
-                            
+
                             batch.update(doc.ref, { rank: rank, lastUpdated: new Date().toISOString() });
                             ops++;
                         }
-                        // set aboveScore and identity for next iteration (next player is lower-ranked, so their "above" is current player)
+
                         aboveScore = currentScore;
                         aboveDocId = doc.id;
                         aboveName = data.name || null;

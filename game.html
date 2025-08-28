@@ -6,7 +6,7 @@
     <meta name="description" content="Hello, World! - A-Frame">
   <link rel="icon" type="image/x-icon" href="assets/images/railgun_logo.ico">
 
-    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="js/DRACOLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
     <script src="js/shader-grid-glitch.js"></script>
@@ -78,13 +78,14 @@
           <img id="leaderboard_bg" src="assets/images/leaderboard.png">
           <img id="logout_bg" src="assets/images/logout_button.png">
           <img id="start_bg" src="assets/images/start_game.png">
+          <img id="bg" src="assets/images/begin.jpg">
           <a-asset-item id="futura" src="assets/fonts/futura_v2.ttf"></a-asset-item>
 
         </a-assets>
 
         <a-entity sound="src: #sao_op"></a-entity> 
         <a-entity gltf-model="#map" position="1.6 -50 -0.8" rotation="0 200 0" scale="1 1 1"></a-entity>
-        <a-sky color="#000"></a-sky>
+        <a-sky src="#bg"></a-sky>
         <a-image id="logout" logout class="logout" src="#logout_bg" width="5" height="1.25" position="0 -5 -3" rotation="-90 20 0">
             <a-entity troika-text="value: Logout; font: #futura; color: white; fontSize: 0.75; anchor: center" position="-0.9 0 0.01"></a-entity>
         </a-image>
@@ -112,7 +113,8 @@
         <a-entity
             camera
             position="0 1 0"
-            look-controls="true">
+            look-controls>
+          
             <a-image id="timer_plane" src="#timer_bg" width="4" height="1" position="0.0 3.25 -5">
                 <a-entity id="time" timer troika-text="value: 60s; font: #futura; color: #fff; anchor: center; fontSize: 0.35" position="0 -0.3 0.5"></a-entity>
             </a-image>
@@ -120,7 +122,7 @@
               <a-entity id="score" troika-text="value: Score: 0; font: #futura; fontSize: 0.35; color: #fff; anchor: center" position="-0.7 -0.3 0.5">
               </a-entity>
             </a-image>
-            <a-entity gltf-model="#sinon" animation-mixer="loop: repeat;" position="0 -0.9 -0.7" scale="2 2 2" rotation="0 180 0"></a-entity>
+            <a-entity gltf-model="#sinon" animation-mixer="loop: repeat;" position="0 -0.7 -0.7" scale="2 2 2" rotation="0 180 0"></a-entity>
             <a-entity
               id="ray"
               cursor="fuse: true;"

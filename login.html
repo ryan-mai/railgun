@@ -6,7 +6,7 @@
     <meta name="description" content="Hello, World! - A-Frame">
   <link rel="icon" type="image/x-icon" href="assets/images/railgun_logo.ico">
 
-    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
@@ -50,7 +50,7 @@
       </a-assets>
       <a-entity sound="src: #sao_op; autoplay: true; loop: true; volume: 0.5; positional: false"></a-entity>
       <a-image src="#tip" width="13" height="1.75" position="-1 5.5 -6">
-            <a-entity troika-text="value: Move your cursor to type letters, or to click Google Signup or Skip Login; color: white; anchor:left; fontSize:0.35" position="-6 0.3 0.01"></a-entity>
+            <a-entity troika-text="value: Move your cursor to type letters, or to access Google Signup or Skip Login; color: white; anchor:left; fontSize:0.35" position="-6 0.3 0.01"></a-entity>
       </a-image>
       <a-image src="#login_info" width="8" height="1.25" position="0 6.75 -5">
             <a-entity troika-text="value: Account Setup ; color: white; fontSize:0.6" position="0 0.04 0.01"></a-entity>
@@ -166,7 +166,7 @@
         <a-entity
             camera
             position="0 3 2"
-            look-controls="true">
+            look-controls>
             <a-entity
               id="ray"
               cursor="fuse: true;"
